@@ -26,24 +26,43 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'https://github.com/ThePrimeagen/vim-be-good'
 Plug 'tpope/vim-fugitive'
 Plug 'norcalli/nvim-colorizer.lua'
+Plug 'rust-lang/rust.vim'
 " post install (yarn install | npm install) then load plugin only for editing supported files
 Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --production' }
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.1' }
+Plug 'ThePrimeagen/harpoon'
 
 call plug#end()
 set encoding=UTF-8
+"leader
+let mapleader = "\<Space>"
+"telescope
+nnoremap <leader>f <cmd>Telescope find_files<cr>
+nnoremap <leader>g <cmd>Telescope live_grep<cr>
+nnoremap <leader>b <cmd>Telescope buffers<cr>
+"harpoon
+nnoremap <leader>a <cmd>lua require("harpoon.mark").add_file()<cr>
+nnoremap <leader>h <cmd>lua require("harpoon.ui").nav_prev()<cr>
+nnoremap <leader>l <cmd>lua require("harpoon.ui").nav_next()<cr>
+nnoremap <leader>m <cmd>lua require("harpoon.ui").toggle_quick_menu()<cr>
+
 nnoremap <C-f> :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-l> :call CocActionAsync('jumpDefinition')<CR>
-nnoremap <C-j> :10split term://powershell<CR>
+nnoremap <C-j> :10split term://powershell<CR><C-w><C-r><C-w><C-r>
 nnoremap <C-s> :w<CR>
 nnoremap <C-b> <C-b>zz
 nnoremap <C-d> <C-d>zz
 "tabs
-nnoremap H :tabl<CR>
-nnoremap L :tabr<CR>
+nnoremap L :tabl<CR>
+nnoremap H :tabr<CR>
 nnoremap <C-x> :tabclose<CR>
 
+"usefull itens
+inoremap <C-p> \|
+inoremap <C-r> \
 
 "fast coments
 vnoremap <C-k> :norm i//<CR>
@@ -78,7 +97,7 @@ EOF
 
 syntax on
 set background=dark
-	set termguicolors
+set termguicolors
 set guifont=consolas:h10
 colorscheme lucid
 highlight @tag guifg=#ffffff
@@ -89,11 +108,17 @@ highlight @string guifg=#ffdb00
 highlight @boolean guifg=#ffdb00
 highlight @number guifg=#ffdb00
 highlight @character guifg=#ffafcc
-highlight LineNr guifg=#ffdb00 guibg=#333333
+highlight LineNr guifg=#ffffff guibg=#333333
+highlight LineNrAbove guifg=#cf45cd guibg=#333333
+highlight LineNrBelow guifg=#ffdb00 guibg=#333333
 highlight @float guifg=#ffdb00
 highlight Identifier guifg=#ffc8dd
 highlight @comment guifg=#00ff00
 highlight Visual guifg=#cccccc guibg=#222222
+highlight TabLineSel guifg=#ffdb00 guibg=#444444
+highlight TabLine guifg=#ccb900 guibg=#222222
+highlight TabLineFill guifg=#000000
+highlight CocInlayHint guifg=#ff5555 guibg=#000000
 
 let g:neovide_cursor_vfx_mode="pixiedust"
 let g:neovide_cursor_vfx_particle_lifetime=10
@@ -105,6 +130,7 @@ let g:NERDTreeDirArrowCollapsible="~"
 let g:NERDTreeMapOpenInTab='<C-ENTER>'
 let g:prettier#autoformat=1
 let g:prettier#autoformat_require_pragma = 0
+let g:rustfmt_autosave = 1
 
 " --- Just Some Notes ---
 " :PlugClean :PlugInstall :UpdateRemotePlugins
