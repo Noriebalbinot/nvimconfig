@@ -6,6 +6,8 @@
 :set smarttab
 :set softtabstop=4
 :set mouse=a
+:set scrolloff=10
+let g:startify_header=['test']
 
 call plug#begin()
 
@@ -14,14 +16,13 @@ Plug 'https://github.com/preservim/nerdtree' " NerdTree
 Plug 'https://github.com/tpope/vim-commentary' " For Commenting gcc & gc
 Plug 'https://github.com/vim-airline/vim-airline' " Status bar
 Plug 'https://github.com/lifepillar/pgsql.vim' " PSQL Pluging needs :SQLSetType pgsql.vim
-Plug 'https://github.com/ap/vim-css-color' " CSS Color Preview
 Plug 'https://github.com/rafi/awesome-vim-colorschemes' " Retro Scheme
-Plug 'https://github.com/neoclide/coc.nvim'  " Auto Completion
+" Plug 'https://github.com/neoclide/coc.nvim'  " Auto Completion
 Plug 'https://github.com/ryanoasis/vim-devicons' " Developer Icons
 Plug 'https://github.com/tc50cal/vim-terminal' " Vim Terminal
 Plug 'https://github.com/preservim/tagbar' " Tagbar for code navigation
 Plug 'https://github.com/terryma/vim-multiple-cursors' " CTRL + N for multiple cursors
-Plug "https://github.com/WhiteBlackGoose/andromeda.nvim"
+Plug 'https://github.com/WhiteBlackGoose/andromeda.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'https://github.com/ThePrimeagen/vim-be-good'
 Plug 'tpope/vim-fugitive'
@@ -32,11 +33,65 @@ Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --producti
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.1' }
 Plug 'ThePrimeagen/harpoon'
-Plug 'ryanoasis/vim-devicons'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight' 
+Plug 'ObserverOfTime/coloresque.vim'
+Plug 'ggandor/leap.nvim'
+" LSP Support
+Plug 'neovim/nvim-lspconfig'                           " Required
+Plug 'williamboman/mason.nvim', {'do': ':MasonUpdate'} " Optional
+Plug 'williamboman/mason-lspconfig.nvim'               " Optional
+" Autocompletion
+Plug 'hrsh7th/nvim-cmp'     " Required
+Plug 'hrsh7th/cmp-nvim-lsp' " Required
+Plug 'L3MON4D3/LuaSnip'     " Required
+Plug 'mhinz/vim-startify'
+Plug 'VonHeikemen/lsp-zero.nvim', {'branch': 'v2.x'}
 
 call plug#end()
+
+lua <<EOF
+
+local lsp = require('lsp-zero').preset({})
+
+lsp.on_attach(function(client, bufnr)
+  lsp.default_keymaps({buffer = bufnr})
+end)
+
+-- (Optional) Configure lua language server for neovim
+require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
+
+lsp.setup()
+EOF
+
+lua <<EOF
+-- Make sure you setup `cmp` after lsp-zero
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
+
+cmp.setup({
+  mapping = {
+    -- `Enter` key to confirm completion
+    ['<CR>'] = cmp.mapping.confirm({select = false}),
+
+    -- Ctrl+Space to trigger completion menu
+    ['<C-Space>'] = cmp.mapping.complete(),
+
+    -- Navigate between snippet placeholder
+    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+  }
+})
+EOF
+
+
+
+
+
+
 set encoding=UTF-8
+
+lua require('leap').add_default_mappings()
 "leader
 let mapleader = "\<Space>"
 "telescope
@@ -57,13 +112,26 @@ nnoremap <C-j> :10split term://powershell<CR><C-w><C-r><C-w><C-r>
 nnoremap <C-s> :w<CR>
 nnoremap <C-b> <C-b>zz
 nnoremap <C-d> <C-d>zz
+nnoremap <leader>v :split<CR>
+nnoremap <leader>c :vsplit<CR>
+nnoremap <leader>x :Gdiffsplit<CR>
+nnoremap <leader>] :10winc -<CR>
+nnoremap <leader>[ :10winc +<CR>
+nnoremap <leader>. :30winc ><CR>
+nnoremap <leader>, :30winc <<CR>
+tnoremap <Esc> <C-\><C-n>
+"zoom-in-out
+nnoremap <leader>o :let g:neovide_scale_factor -= 0.5<CR>:let g:neovide_scale_factor<CR>
+nnoremap <leader>i :let g:neovide_scale_factor += 0.5<CR>:let g:neovide_scale_factor<CR>
+
 "tabs
+nnoremap <leader>nt :tabnew term://powershell<CR>
 nnoremap L :tabl<CR>
 nnoremap H :tabr<CR>
 nnoremap <C-x> :tabclose<CR>
-
+					
 "usefull itens
-inoremap <C-p> \|
+inoremap <C-t> \|
 inoremap <C-r> \
 
 "fast coments
@@ -73,7 +141,7 @@ vnoremap <C-l> :norm 2x/<CR>
 
 nmap <F8> :TagbarToggle<CR>
 
-autocmd VimEnter * ++nested :10split term://powershell | wincmd w | wincmd r 
+" autocmd VimEnter * ++nested :10split term://powershell | wincmd w | wincmd r 
 autocmd VimEnter * ++nested :NERDTreeFocus
 ":set completeopt-=preview  For No Previews
 
@@ -102,6 +170,7 @@ set background=dark
 set termguicolors
 set guifont=DaddyTimeMono\ Nerd\ Font:h10
 colorscheme hybrid
+highlight Normal guibg=NONE
 highlight @tag guifg=#ffffff
 highlight @variable guifg=#f72585
 highlight @keyword guifg=#00b4d8
@@ -113,7 +182,7 @@ highlight @character guifg=#ffafcc
 highlight LineNr guifg=#ffffff guibg=#333333
 highlight LineNrAbove guifg=#cf45cd guibg=#333333
 highlight LineNrBelow guifg=#ffdb00 guibg=#333333
-highlight @float guifg=#ffdb00
+highlight @float guifg=#FFDB00
 highlight Identifier guifg=#ffc8dd
 highlight @comment guifg=#00ff00
 highlight Visual guifg=#cccccc guibg=#222222
@@ -122,18 +191,22 @@ highlight TabLine guifg=#ccb900 guibg=#222222
 highlight TabLineFill guifg=#000000
 highlight CocInlayHint guifg=#ff5555 guibg=#000000
 
+"startify configs
+
+
 let g:neovide_cursor_vfx_mode="pixiedust"
 let g:neovide_cursor_vfx_particle_lifetime=10
 let g:neovide_cursor_vfx_particle_opacity=400
 let g:neovide_cursor_vfx_particle_density=20
 let g:neovide_transparency=1
+let g:neovide_fullscreen=1
 let g:NERDTreeDirArrowExpandable="+"
 let g:NERDTreeDirArrowCollapsible="~"
 let g:NERDTreeMapOpenInTab='<C-ENTER>'
 let g:prettier#autoformat=1
 let g:prettier#autoformat_require_pragma = 0
 let g:rustfmt_autosave = 1
-
+let g:coloresque_whitelist = ['css', 'html', 'javascript', 'jsx', 'typescript', 'vim', 'tsx']
 " --- Just Some Notes ---
 " :PlugClean :PlugInstall :UpdateRemotePlugins
 " air-line
@@ -152,9 +225,6 @@ let g:airline_symbols.readonly = ''
 let g:airline_symbols.linenr = ''
 let g:airline_section_z = '%{strftime("%c")}'
 
-
-inoremap <expr> <CR> pumvisible() ? coc#_select_confirm() : "<CR>"
-inoremap <silent><expr> <C-space> coc#refresh()
 
 
 "nerdtree color config 
@@ -202,7 +272,7 @@ let g:NERDTreeExactMatchHighlightColor['.gitignore'] = s:git_orange " sets the c
 let g:NERDTreePatternMatchHighlightColor = {} " this line is needed to avoid error
 let g:NERDTreePatternMatchHighlightColor['.*_spec\.rb$'] = s:rspec_red " sets the color for files ending with _spec.rb
 
-let g:WebDevIconsDefaultFolderSymbolColor = s:beige " sets the color for folders that did not match any rule
+let g:WebDevIconsDefaultFolderSymbolColor = s: " sets the color for folders that did not match any rule
 let g:WebDevIconsDefaultFileSymbolColor = s:blue" sets the color for files that did not match any rule
 
 
