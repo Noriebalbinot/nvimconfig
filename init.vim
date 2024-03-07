@@ -21,7 +21,7 @@ Plug 'https://github.com/rafi/awesome-vim-colorschemes' " Retro Scheme
 Plug 'https://github.com/ryanoasis/vim-devicons' " Developer Icons
 Plug 'https://github.com/tc50cal/vim-terminal' " Vim Terminal
 Plug 'https://github.com/preservim/tagbar' " Tagbar for code navigation
-Plug 'https://github.com/terryma/vim-multiple-cursors' " CTRL + N for multiple cursors
+Plug 'https://github.com/mg979/vim-visual-multi' " CTRL + N for multiple cursors
 Plug 'https://github.com/WhiteBlackGoose/andromeda.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'https://github.com/ThePrimeagen/vim-be-good'
@@ -36,6 +36,7 @@ Plug 'ThePrimeagen/harpoon'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight' 
 Plug 'ObserverOfTime/coloresque.vim'
 Plug 'ggandor/leap.nvim'
+Plug 'puremourning/vimspector'
 " LSP Support
 Plug 'neovim/nvim-lspconfig'                           " Required
 Plug 'williamboman/mason.nvim', {'do': ':MasonUpdate'} " Optional
@@ -46,9 +47,25 @@ Plug 'hrsh7th/cmp-nvim-lsp' " Required
 Plug 'L3MON4D3/LuaSnip'     " Required
 Plug 'mhinz/vim-startify'
 Plug 'VonHeikemen/lsp-zero.nvim', {'branch': 'v2.x'}
-
+Plug 'antoinemadec/FixCursorHold.nvim'
+Plug 'nvim-neotest/neotest'
+Plug 'haydenmeade/neotest-jest'
+Plug 'nvim-neotest/neotest-plenary'
 call plug#end()
-
+lua <<EOF
+require('neotest').setup({
+      ...,
+      adapters = {
+        require('neotest-jest')({
+          jestCommand = "yarn test",
+          jestConfigFile = "jest.config.js",
+          env = { CI = true },
+          cwd = function(path)
+            return vim.fn.getcwd()
+          end,
+}),require("neotest-plenary"),
+}})
+EOF
 lua <<EOF
 
 local lsp = require('lsp-zero').preset({})
@@ -83,8 +100,6 @@ cmp.setup({
   }
 })
 EOF
-
-
 
 
 
@@ -147,13 +162,13 @@ nmap <F8> :TagbarToggle<CR>
 
 lua << EOF
 	require'nvim-treesitter.configs'.setup {
-	ensure_installed= { "javascript","c", "lua", "vim"},
+	ensure_installed= { "rust", "javascript","c", "lua", "vim"},
 	sync_install= false,
 	auto_install = true,
 	ignore_install = {},
 	highlight = {
 	enable = true,
-	disable = { "c", "rust" },
+	disable = { "c"  },
 	disable = function(lang, buf)
 	local max_filesize = 100 * 1024 -- 100 KB
 	local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
@@ -170,7 +185,8 @@ set background=dark
 set termguicolors
 set guifont=DaddyTimeMono\ Nerd\ Font:h10
 colorscheme hybrid
-highlight Normal guibg=NONE
+" highlight Normal guibg=#232323
+ highlight Normal guibg=none
 highlight @tag guifg=#ffffff
 highlight @variable guifg=#f72585
 highlight @keyword guifg=#00b4d8
@@ -193,7 +209,10 @@ highlight CocInlayHint guifg=#ff5555 guibg=#000000
 
 "startify configs
 
-
+let g:Vimspector_enable_mappings = 'HUMAN'
+let g:vimspector_sidebar_width = 85
+let g:vimspector_bottombar_height = 15
+let g:vimspector_terminal_maxwidth = 70
 let g:neovide_cursor_vfx_mode="pixiedust"
 let g:neovide_cursor_vfx_particle_lifetime=10
 let g:neovide_cursor_vfx_particle_opacity=400
@@ -254,18 +273,22 @@ let s:white = "FFFFFF"
 let s:rspec_red = 'FE405F'
 let s:git_orange = 'F54D27'
 
+let g:NERDTreePatternMatchHighlightColor = {}
+let g:NERDTreePatternMatchHighlightColor['.*test\.ts$'] = s:red
+let g:NERDTreePatternMatchHighlightColor['.*test\.tsx$'] = s:red
 let g:NERDTreeExtensionHighlightColor = {} " this line is needed to avoid error
 let g:NERDTreeExtensionHighlightColor['css'] = s:purple " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['vim'] = s:green " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['tsx'] = s:darkBlue " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['html'] = s:orange " sets the color of css files to blue
-let g:NERDTreeExtensionHighlightColor['ts'] = s:blue " sets the color of css files to blue
+let g:NERDTreeExtensionHighlightColor['ts'] = s:lightPurple " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['js'] = s:yellow " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['jsx'] = s:aqua " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['json'] = s:lightGreen " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['rs'] = s:darkOrange " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['toml'] = s:salmon " sets the color of css files to blue
 let g:NERDTreeExtensionHighlightColor['md'] = s:aqua " sets the color of css files to blue
+
 let g:WebDevIconsDefaultFolderSymbolColor = s:beige " sets the color for folders that did not match any rule
 let g:WebDevIconsDefaultFileSymbolColor = s:blue" sets the color for files that did not match any rule
 
